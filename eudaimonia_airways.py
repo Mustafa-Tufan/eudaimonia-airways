@@ -180,22 +180,22 @@ model.constraints.add(model.z4 + model.z5 >= 1)
 # Ensures that cumulative limit for each position in Main deck in front part is not violated
 for j in model.Pallet_Index:
     for k in range(34):
-        model.constraints.add(sum(model.M[(i,j)] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(k) if H_arm_M.values[i] <= H_arm_M.values[k]) + sum(model.L[(i,j)] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in range(12) if H_arm_L[i] <= H_arm_M[k]) <= Cumulative_M[k])
+        model.constraints.add(sum(model.M[(i,j)] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(34) if H_arm_M.values[i] <= H_arm_M.values[k]) + sum(model.L[(i,j)] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in range(12) if H_arm_L[i] <= H_arm_M[k]) <= Cumulative_M[k])
 
 # Ensures that cumulative limit for each position in Lower deck in front part is not violated
 for j in model.Pallet_Index:
     for k in range(12):
-        model.constraints.add(sum(model.M[(i,j)] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(34) if H_arm_M.values[i] <= H_arm_L.values[k]) + sum(model.L[(i,j)] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in range(k) if H_arm_L[i] <= H_arm_L[k]) <= Cumulative_L[k])
+        model.constraints.add(sum(model.M[(i,j)] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(34) if H_arm_M.values[i] <= H_arm_L.values[k]) + sum(model.L[(i,j)] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in range(12) if H_arm_L[i] <= H_arm_L[k]) <= Cumulative_L[k])
 
 # Ensures that cumulative limit for each position in Main deck in aft part is not violated
 for j in model.Pallet_Index:
     for k in range(41,82):
-        model.constraints.add(sum(model.M[(i,j)] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(k,82) if H_arm_M.values[i] <= H_arm_M.values[k]) + sum(model.L[(i,j)] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in (12,22) if H_arm_L[i] <= H_arm_M[k]) <= Cumulative_M[k])
+        model.constraints.add(sum(model.M[(i,j)] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(41,82) if H_arm_M.values[i] <= H_arm_M.values[k]) + sum(model.L[(i,j)] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in range(12,22) if H_arm_L[i] <= H_arm_M[k]) <= Cumulative_M[k])
 
 # Ensures that cumulative limit for each position in Lower deck in aft part is not violated
 for j in model.Pallet_Index:
     for k in range(12,22):
-        model.constraints.add(sum(model.M[(i,j)] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(41,82) if H_arm_M.values[i] <= H_arm_L.values[k]) + sum(model.L[(i,j)] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in (k,22) if H_arm_L[i] <= H_arm_L[k]) <= Cumulative_L[k])
+        model.constraints.add(sum(model.M[(i,j)] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(41,82) if H_arm_M.values[i] <= H_arm_L.values[k]) + sum(model.L[(i,j)] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in range(12,22) if H_arm_L[i] <= H_arm_L[k]) <= Cumulative_L[k])
 
 # -----------------------------------
 #        PART 4: BLUE ENVELOPE
