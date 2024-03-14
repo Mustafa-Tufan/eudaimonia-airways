@@ -65,6 +65,7 @@ model.M = Var(model.Main_Deck_Position_Index, model.Pallet_Index, within=Binary)
 model.L = Var(model.Lower_Deck_Position_Index, model.Pallet_Index, within=Binary)
 model.w = Var(model.Position_Index, domain=PositiveIntegers)
 model.i = Var(model.Position_Index, domain=PositiveIntegers)
+
 model.W = 0
 model.I = 0
 
@@ -93,6 +94,7 @@ model.constraints = ConstraintList()
 
 # at max 1 pallet to each position
 # Do we really need those? 
+
 for i in model.Main_Deck_Position_Index:
     model.constraints.add(sum(model.M[(i,j)] for j in model.Pallet_Index) <= 1)
 for i in model.Lower_Deck_Position_Index:
@@ -107,7 +109,7 @@ for i in model.Lower_Deck_Position_Index:
 # At max 1 pallet to each position  
 for j in model.Pallet_Index:
     model.constraints.add(sum(model.M[(i,j)] for j in model.Pallet_Index) + sum(model.L[(i,j)] for j in model.Pallet_Index) <= 1)
-    
+ 
 # Pallet type control
 # Added binary decision variables y1 y2 y3 y4 to the model for this part
 K = 10000
@@ -166,7 +168,7 @@ for i in model.Lower_Deck_Position_Index:
     for k in model.Lower_Deck_Position_Index:
         if k != i:           
             model.constraints.add(sum(model.L[(i,j)] * Lock2_L.values[i] for j in model.Pallet_Index) - sum(model.L[(k,n)] * Lock1_L.values[k] for n in model.Pallet_Index) <= K * (1 - model.z4))                       
-            model.constraints.add(sum(model.L[(i,j)] * Lock2_L.values[i] for j in model.Pallet_Index) - sum(model.M[(k,n)] * Lock2_L.values[k] for n in model.Pallet_Index) <= K * (1 - model.z4))            
+            model.constraints.add(sum(model.L[(i,j)] * Lock2_L.values[i] for j in model.Pallet_Index) - sum(model.L[(k,n)] * Lock2_L.values[k] for n in model.Pallet_Index) <= K * (1 - model.z4))            
             model.constraints.add(sum(model.L[(k,n)] * Lock1_L.values[k] for n in model.Pallet_Index) - sum(model.L[(i,j)] * Lock1_L.values[i] for j in model.Pallet_Index) <= K * (1 - model.z5))
             model.constraints.add(sum(model.L[(k,n)] * Lock1_L.values[k] for n in model.Pallet_Index) - sum(model.L[(i,j)] * Lock2_L.values[i] for j in model.Pallet_Index) <= K * (1 - model.z5))
 # At least one of the above should be satisfied
@@ -174,11 +176,11 @@ model.constraints.add(model.z4 + model.z5 >= 1)
 # -----------------------------------
 #        PART 3: CUMULATIVE
 # -----------------------------------
-print("3")
+
 # Ensures that cumulative limit for each position in Main deck in front part is not violated
 for j in model.Pallet_Index:
     for k in range(34):
-        model.constraints.add(sum(model.M[(i,j)] * model.Pallet_Weight[j] * Coefficient_M.values[i] for i in range(k) if H_arm_M.values[i]) + sum(H_arm_M.values[k] + model.L[(i,j)] * model.Pallet_Weight[j] * Coefficient_L.values[i] for i in range(12) if H_arm_L[i] <= H_arm_M[k]) <= Cumulative_M[k])
+        model.constraints.add(sum(model.M[(i,j)] * model.Pallet_Weight[j] * Coefficient_M.values[i] for i in range(k) if H_arm_M.values[i] <= H_arm_M.values[k]) + sum(model.L[(i,j)] * model.Pallet_Weight[j] * Coefficient_L.values[i] for i in range(12) if H_arm_L[i] <= H_arm_M[k]) <= Cumulative_M[k])
 
 # Ensures that cumulative limit for each position in Lower deck in front part is not violated
 for j in model.Pallet_Index:
@@ -194,7 +196,7 @@ for j in model.Pallet_Index:
 for j in model.Pallet_Index:
     for k in range(12,22):
         model.constraints.add(sum(model.M[(i,j)] * model.Pallet_Weight[j] * Coefficient_M.values[i] for i in range(41,82) if H_arm_M.values[i] <= H_arm_L.values[k]) + sum(model.L[(i,j)] * model.Pallet_Weight[j] * Coefficient_L.values[i] for i in (k,22) if H_arm_L[i] <= H_arm_L[k]) <= Cumulative_L[k])
-print("4")
+
 # -----------------------------------
 #        PART 4: BLUE ENVELOPE
 # -----------------------------------
@@ -222,7 +224,7 @@ model.constraints.add(model.W >= 120)
 model.constraints.add(model.W <= 180)
 
 # Solve
-solver = SolverFactory('cplex_direct')
+solver = SolverFactory('gurobi_direct')
 solver.solve(model)
 display(model)
 
