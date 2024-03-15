@@ -60,13 +60,13 @@ model.Position_Index = RangeSet(0,103)
 model.Pallet_Index = RangeSet(0, len(Pallet_Type) - 1)
 
 # Decision Variables
-model.M = Var(model.Main_Deck_Position_Index, model.Pallet_Index, within=Binary)
-model.L = Var(model.Lower_Deck_Position_Index, model.Pallet_Index, within=Binary)
-model.w = Var(model.Position_Index, domain=NonNegativeIntegers)
-model.i = Var(model.Position_Index, domain=NonNegativeIntegers)
+model.M = Var(model.Main_Deck_Position_Index, model.Pallet_Index, within=Binary, initialize=0)
+model.L = Var(model.Lower_Deck_Position_Index, model.Pallet_Index, within=Binary, initialize=0)
+model.w = Var(model.Position_Index, domain=NonNegativeIntegers, initialize=0)
+model.i = Var(model.Position_Index, domain=NonNegativeIntegers, initialize=0)
 
-model.W = Var(domain=NonNegativeIntegers)
-model.I = Var(domain=NonNegativeIntegers)
+model.W = Var(domain=NonNegativeIntegers,initialize=0)
+model.I = Var(domain=NonNegativeIntegers,initialize=0)
 
 # Binary decision variables that we are going to use for (and-or) or (if-then) constraints
 # TODO give domains to these so we won't have millions of binary decision variables
