@@ -40,7 +40,6 @@ Type_L = Positions_L.iloc[:,7]
 # Take the pallet dat
 Pallets = pd.read_excel('END395_ProjectPartIDataset.xlsx', sheet_name='Pallets1')
 
-# TODO Pallet Type'yi integer olarak çek
 Pallet_Type = Pallets.iloc[:,1]
 for i in range(len(Pallet_Type)):
     if Pallet_Type.values[i].startswith("PAG"):
@@ -224,7 +223,7 @@ model.constraints.add(model.W >= 120)
 model.constraints.add(model.W <= 180)
 
 # Solve
-solver = SolverFactory('gurobi_direct')
+solver = SolverFactory('cplex')
 solver.solve(model)
 display(model)
 
