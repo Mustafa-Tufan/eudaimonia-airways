@@ -6,10 +6,10 @@ import pandas as pd
 excel_file = pd.read_excel('END395_ProjectPartIDataset.xlsx', sheet_name='Positions')
 
 # Add new column for position types
-excel_file.loc[0:20, 'Type'] = 0
-excel_file.loc[20:60, 'Type'] = 1
-excel_file.loc[60:93, 'Type'] = 0
-excel_file.loc[93:104, 'Type'] = 1
+excel_file.loc[0:19, 'Type'] = 0
+excel_file.loc[20:59, 'Type'] = 1
+excel_file.loc[60:92, 'Type'] = 0
+excel_file.loc[93:103, 'Type'] = 1
 
 # Sort the sheet by H-arm's and create new one
 sorted_excel_file_M = excel_file.iloc[:82].sort_values(by='H-arm', ascending=True)
@@ -60,13 +60,13 @@ model.Position_Index = RangeSet(0,103)
 model.Pallet_Index = RangeSet(0, len(Pallet_Type) - 1)
 
 # Decision Variables
-model.M = Var(model.Main_Deck_Position_Index, model.Pallet_Index, within=Binary, initialize=0)
-model.L = Var(model.Lower_Deck_Position_Index, model.Pallet_Index, within=Binary, initialize=0)
-model.w = Var(model.Position_Index, domain=NonNegativeIntegers, initialize=0)
-model.i = Var(model.Position_Index, domain=NonNegativeIntegers, initialize=0)
+model.M = Var(model.Main_Deck_Position_Index, model.Pallet_Index, within=Binary)
+model.L = Var(model.Lower_Deck_Position_Index, model.Pallet_Index, within=Binary)
+model.w = Var(model.Position_Index, domain=NonNegativeIntegers)
+model.i = Var(model.Position_Index, domain=NonNegativeIntegers)
 
-model.W = Var(domain=NonNegativeIntegers,initialize=0)
-model.I = Var(domain=NonNegativeIntegers,initialize=0)
+model.W = Var(domain=NonNegativeIntegers)
+model.I = Var(domain=NonNegativeIntegers)
 
 # Binary decision variables that we are going to use for (and-or) or (if-then) constraints
 # TODO give domains to these so we won't have millions of binary decision variables
@@ -82,8 +82,10 @@ model.z3 = Var(within=Binary)
 model.z4 = Var(within=Binary)
 model.z5 = Var(within=Binary)
 
+def ObjRule(model):
+    return sum(sum(model.M[i,j] * Pallet_Weight.values[j] for j in model.Pallet_Index) for i in model.Main_Deck_Position_Index) + sum(sum(model.L[i,j] * Pallet_Weight.values[j] for j in model.Pallet_Index) for i in model.Lower_Deck_Position_Index)
 # Objective function
-model.obj = Objective(expr=sum(model.w[i] for i in model.Position_Index), sense=maximize)
+model.obj = Objective(rule=ObjRule, sense=maximize)
 
 model.constraints = ConstraintList()
 
@@ -225,7 +227,7 @@ model.constraints.add(model.W <= 180)
 # Solve
 solver = SolverFactory('cplex')
 solver.solve(model)
-display(model)
+#display(model)
 
 #Calculate the CPU time
 cpu_time = time.time() - start_time
