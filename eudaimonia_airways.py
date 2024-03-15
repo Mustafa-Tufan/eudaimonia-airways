@@ -109,8 +109,7 @@ for i in model.Lower_Deck_Position_Index:
     
 # At max 1 pallet to each position  
 for j in model.Pallet_Index:
-    model.constraints.add(sum(model.M[i,j] for j in model.Pallet_Index) + sum(model.L[i,j] for j in model.Pallet_Index) <= 1)
- 
+    model.constraints.add(sum(model.M[i,j] for i in model.Main_Deck_Position_Index) + sum(model.L[i,j] for i in model.Lower_Deck_Position_Index) <= 1)
 # Pallet type control
 # Added binary decision variables y1 y2 y3 y4 to the model for this part
 K = 10000
