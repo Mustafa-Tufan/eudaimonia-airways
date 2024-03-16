@@ -229,11 +229,11 @@ for i in model.Lower_Deck_Position_Index:
 # Index of each position
 for i in model.Main_Deck_Position_Index:
     for j in model.Pallet_Index:
-        model.constraints.add(model.i[i] >= model.M[i,j] * (((H_arm_M[i] - 36.3495) * model.w[i]) / 2500))
+        model.constraints.add(model.i[i] >= model.M[i,j] * (((H_arm_M[i] - 36.3495) * Pallet_Weight.values[j]) / 2500))
     
 for i in model.Lower_Deck_Position_Index:
     for j in model.Pallet_Index:
-        model.constraints.add(model.i[i + 60] >= model.L[i,j] * (((H_arm_L[i] - 36.3495) * model.w[i + 60]) / 2500))
+        model.constraints.add(model.i[i + 60] >= model.L[i,j] * (((H_arm_L[i] - 36.3495) * Pallet_Weight.values[j]) / 2500))
 
 
 # Total weight and Total index
@@ -241,9 +241,10 @@ model.constraints.add(model.I >=  sum(model.i[i] for i in model.Position_Index) 
 model.constraints.add(model.W >=  sum(model.w[i] for i in model.Position_Index) + model.DOW)
 
 # Blue envelope constraints
-model.constraints.add(2 * model.I -model.W <= 240)
-model.constraints.add(model.I + model.W >= 235)
-model.constraints.add(model.W >= 120)
+model.constraints.add(2 * model.I - (model.W/1000) <= 240)
+model.constraints.add(model.I + (model.W/1000) >= 235)
+model.constraints.add((model.W/1000) >= 120)
+model.constraints.add((model.W/1000) <= 180)
 
 # Solve
 solver = SolverFactory('gurobi')
