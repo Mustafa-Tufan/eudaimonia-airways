@@ -250,8 +250,8 @@ solver = SolverFactory('gurobi')
 solver.solve(model)
 #display(model)
 
-for i in model.Position_Index:
-    print(value(model.i[i]))
+#for i in model.Position_Index:
+#    print(value(model.i[i]))
     
 #Calculate the CPU time
 cpu_time = time.time() - start_time
