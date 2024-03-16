@@ -162,26 +162,25 @@ for i in model.Lower_Deck_Position_Index:
 #        PART 2: COLLISION
 # -----------------------------------
 
-#Upper Deck
-for i in model.Main_Deck_Position_Index:
-    for j in model.Main_Deck_Position_Index:
-        if(i != j):
-            if(Lock1_M[i] <= Lock2_M[j] and Lock2_M[i] >= Lock1_M[j]):
-                if (Lock1_M[i] != Lock1_M[j] or Lock2_M[i] != Lock2_M[j]):
-                    for k in model.Pallet_Index:
-                        model.constraints.add(model.M[i,k] + model.M[j,k]  <= 1 )
-             
-                        
-#Lower Deck
-for i in model.Lower_Deck_Position_Index:
-    for j in model.Lower_Deck_Position_Index:
-        if(i != j):
-            if(Lock1_L[i] <= Lock2_L[j] and Lock2_L[i] >= Lock1_L[j]):
-                if (Lock1_L[i] != Lock1_L[j] or Lock2_L[i] != Lock2_L[j]):
-                    for k in model.Pallet_Index:
-                        model.constraints.add(model.L[i,k] + model.L[j,k]  <= 1 )
 
+# Main Deck
+for i in range(0, len(model.Main_Deck_Position_Index) - 1):
+    for j in range(i + 1, len(model.Main_Deck_Position_Index)):
+        if Lock1_M[i] <= Lock2_M[j] and Lock2_M[i] >= Lock1_M[j]:
+            for k in model.Pallet_Index:
+                for l in model.Pallet_Index:
+                    if k != l:
+                        model.constraints.add(model.M[i,k] + model.M[j,l] <= 1)
 
+# Lower Deck
+for i in range(0, len(model.Lower_Deck_Position_Index) - 1):
+    for j in range(i + 1, len(model.Lower_Deck_Position_Index)):
+        if Lock1_L[i] <= Lock2_L[j] and Lock2_L[i] >= Lock1_L[j]:
+            for k in model.Pallet_Index:
+                for l in model.Pallet_Index:
+                    if k != l:
+                        model.constraints.add(model.L[i,k] + model.L[j,l] <= 1)
+                    
 # -----------------------------------
 #        PART 3: CUMULATIVE
 # -----------------------------------
