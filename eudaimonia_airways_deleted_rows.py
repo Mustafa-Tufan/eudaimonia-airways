@@ -59,11 +59,9 @@ for i in range(len(Pallet_Type)):
     else:
         Pallet_Type.values[i] = 1
 
-
 Pallet_Weight = Pallets.iloc[:,2]
 
 model = ConcreteModel()
-
 
 model.DOW = Pallets.columns[4] #TRICKYYYYYY understandable
 model.DOI = Pallets.iloc[0,4]
@@ -79,11 +77,13 @@ model.Pallet_Index = RangeSet(0, len(Pallet_Type) - 1)
 # Decision Variables
 model.M = Var(model.Main_Deck_Position_Index, model.Pallet_Index, within=Binary)
 model.L = Var(model.Lower_Deck_Position_Index, model.Pallet_Index, within=Binary)
-model.w = Var(model.Position_Index, domain=NonNegativeIntegers)
-model.i = Var(model.Position_Index, domain=Reals)
 
 model.W = Var(domain=NonNegativeIntegers)
 model.I = Var(domain=Reals)
+
+weight = [0] * len(model.Position_Index)
+index = [0] * len(model.Position_Index)
+
 
 # Binary decision variables that we are going to use for (and-or) or (if-then) constraints
 # TODO give domains to these so we won't have millions of binary decision variables
@@ -215,30 +215,25 @@ for k in range(12,22):
 #        PART 4: BLUE ENVELOPE
 # -----------------------------------
 
-
 # Weight of each position
 for i in model.Main_Deck_Position_Index:
-    for j in model.Pallet_Index:
-            model.constraints.add(model.w[i] >= model.M[i,j] * Pallet_Weight.values[j])
+    weight[i] = sum(model.M[i,j] * Pallet_Weight.values[j] for j in model.Pallet_Index)
 
 for i in model.Lower_Deck_Position_Index:
-    for j in model.Pallet_Index:
-            model.constraints.add(model.w[i+60] >= model.L[i,j] * Pallet_Weight.values[j])
+    weight[i+60] = sum(model.L[i,j] * Pallet_Weight.values[j] for j in model.Pallet_Index)
 
-
-# Index of each position
 for i in model.Main_Deck_Position_Index:
-    for j in model.Pallet_Index:
-        model.constraints.add(model.i[i] >= model.M[i,j] * (((H_arm_M[i] - 36.3495) * Pallet_Weight.values[j]) / 2500))
-    
+    index[i] = sum(model.M[i,j] * (((H_arm_M[i] - 36.3495) * Pallet_Weight.values[j]) / 2500) for j in model.Pallet_Index)
+
 for i in model.Lower_Deck_Position_Index:
-    for j in model.Pallet_Index:
-        model.constraints.add(model.i[i + 60] >= model.L[i,j] * (((H_arm_L[i] - 36.3495) * Pallet_Weight.values[j]) / 2500))
+    index[i+60] = sum(model.L[i,j] * (((H_arm_L[i] - 36.3495) * Pallet_Weight.values[j]) / 2500) for j in model.Pallet_Index)
 
 
-# Total weight and Total index
-model.constraints.add(model.I >=  sum(model.i[i] for i in model.Position_Index) + model.DOI)
-model.constraints.add(model.W >=  sum(model.w[i] for i in model.Position_Index) + model.DOW)
+model.constraints.add(model.I >=  sum(index[i] for i in model.Position_Index) + model.DOI)
+model.constraints.add(model.I <=  sum(index[i] for i in model.Position_Index) + model.DOI)
+
+model.constraints.add(model.W >=  sum(weight[i] for i in model.Position_Index) + model.DOW)
+model.constraints.add(model.W <=  sum(weight[i] for i in model.Position_Index) + model.DOW)
 
 # Blue envelope constraints
 model.constraints.add(2 * model.I - (model.W/1000) <= 240)
@@ -251,8 +246,6 @@ solver = SolverFactory('gurobi')
 solver.solve(model)
 #display(model)
 
-#for i in model.Position_Index:
-#    print(value(model.i[i]))
     
 #Calculate the CPU time
 cpu_time = time.time() - start_time
