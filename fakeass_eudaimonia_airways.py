@@ -21,10 +21,9 @@ excel_file.drop(labels = "index", axis = 1, inplace = True)
 # Sort the sheet by H-arm's and create new one
 sorted_excel_file_M = excel_file.iloc[:60].sort_values(by='H-arm', ascending=True)
 sorted_excel_file_L = excel_file.iloc[60:].sort_values(by='H-arm', ascending=True)
-
 '''
-sorted_excel_file_M.to_excel('END395_ProjectPartIDataset_SORTED_M.xlsx', index=False)
-sorted_excel_file_L.to_excel('END395_ProjectPartIDataset_SORTED_L.xlsx', index=False)
+sorted_excel_file_M.to_excel('M.xlsx', index=False)
+sorted_excel_file_L.to_excel('L.xlsx', index=False)
 '''
 
 Positions_M = sorted_excel_file_M.reset_index(drop=True)
@@ -120,22 +119,21 @@ model.constraints.add(model.M[25,11] >= 1) #
 model.constraints.add(model.M[35,12] >= 1) #
 model.constraints.add(model.M[40,13] >= 1) #
 model.constraints.add(model.M[56,14] >= 1)
-model.constraints.add(model.M[42,15] >= 1)
+model.constraints.add(model.M[30,15] >= 1)
 model.constraints.add(model.L[18,16] >= 1)
 model.constraints.add(model.L[13,17] >= 1)
-model.constraints.add(model.M[10,18] >= 1)
-model.constraints.add(model.M[41,19] >= 1)
-model.constraints.add(model.M[50,20] >= 1)
-model.constraints.add(model.M[9,21] >= 1)
+model.constraints.add(model.M[6,18] >= 1)
+model.constraints.add(model.M[29,19] >= 1)
+model.constraints.add(model.M[36,20] >= 1)
+model.constraints.add(model.M[7,21] >= 1)
 model.constraints.add(model.L[10,22] >= 1)
-model.constraints.add(model.M[32,23] >= 1)
-model.constraints.add(model.M[23,24] >= 1)
+model.constraints.add(model.M[22,23] >= 1)
+model.constraints.add(model.M[17,24] >= 1)
 model.constraints.add(model.L[0,25] >= 1)
-model.constraints.add(model.M[38,26] >= 1)
-model.constraints.add(model.M[25,27] >= 1)
+model.constraints.add(model.M[26,26] >= 1)
+model.constraints.add(model.M[16,27] >= 1)
 model.constraints.add(model.L[4,28] >= 1)
-model.constraints.add(model.M[80,29] >= 1)
-
+model.constraints.add(model.M[58,29] >= 1)
 
 # -----------------------------------
 #        PART 1: PLACEMENT
@@ -152,7 +150,6 @@ for i in model.Lower_Deck_Position_Index:
 # Weight limit
 for i in model.Main_Deck_Position_Index:
     model.constraints.add(sum((model.M[i,j] * Pallet_Weight.values[j]) for j in model.Pallet_Index) <= Max_Weight_M[i])
-
 for i in model.Lower_Deck_Position_Index:
     model.constraints.add(sum((model.L[i,j] * Pallet_Weight.values[j]) for j in model.Pallet_Index) <= Max_Weight_L[i])
 
@@ -206,7 +203,7 @@ for i in range(0, len(model.Lower_Deck_Position_Index) - 1):
                 for l in model.Pallet_Index:
                     if k != l:
                         model.constraints.add(model.L[i,k] + model.L[j,l] <= 1)
-         
+                         
 # -----------------------------------
 #        PART 3: CUMULATIVE
 # -----------------------------------
