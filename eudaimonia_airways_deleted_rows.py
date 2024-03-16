@@ -82,10 +82,10 @@ model.Position_Index = RangeSet(0,81)
 model.Pallet_Index = RangeSet(0, len(Pallet_Type) - 1)
 
 # Decision Variables
-model.M = Var(model.Main_Deck_Position_Index, model.Pallet_Index, within=Binary, initialize=0)
-model.L = Var(model.Lower_Deck_Position_Index, model.Pallet_Index, within=Binary, initialize=0)
-model.w = Var(model.Position_Index, domain=NonNegativeIntegers, initialize=0)
-model.i = Var(model.Position_Index, domain=NonNegativeReals, initialize=0)
+model.M = Var(model.Main_Deck_Position_Index, model.Pallet_Index, within=Binary)
+model.L = Var(model.Lower_Deck_Position_Index, model.Pallet_Index, within=Binary)
+model.w = Var(model.Position_Index, domain=NonNegativeIntegers)
+model.i = Var(model.Position_Index, domain=NonNegativeReals)
 
 model.W = Var(domain=NonNegativeIntegers)
 model.I = Var(domain=NonNegativeReals)
@@ -180,31 +180,61 @@ for i in range(0, len(model.Lower_Deck_Position_Index) - 1):
                     if k != l:
                         model.constraints.add(model.L[i,k] + model.L[j,l] <= 1)
                     
+'''
+#Upper Deck
+for i in model.Main_Deck_Position_Index:
+    for j in model.Main_Deck_Position_Index:
+        if(i != j):
+            if(Lock1_M[i] <= Lock2_M[j] and Lock2_M[i] >= Lock1_M[j]):
+                if (Lock1_M[i] != Lock1_M[j] or Lock2_M[i] != Lock2_M[j]):
+                    for k in model.Pallet_Index:
+                        model.constraints.add(model.M[i,k] + model.M[j,k]  <= 1 )
+             
+                        
+#Lower Deck
+for i in model.Lower_Deck_Position_Index:
+    for j in model.Lower_Deck_Position_Index:
+        if(i != j):
+            if(Lock1_L[i] <= Lock2_L[j] and Lock2_L[i] >= Lock1_L[j]):
+                if (Lock1_L[i] != Lock1_L[j] or Lock2_L[i] != Lock2_L[j]):
+                    for k in model.Pallet_Index:
+                        model.constraints.add(model.L[i,k] + model.L[j,k]  <= 1 )
 
+'''
 # -----------------------------------
 #        PART 3: CUMULATIVE
 # -----------------------------------
 
-# Ensures that cumulative limit for each position in Main deck in front part is not violated
-for j in model.Pallet_Index:
-    for k in range(26):
-        model.constraints.add(sum(model.M[i,j] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(26) if H_arm_M.values[i] <= H_arm_M.values[k]) + sum(model.L[i,j] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in range(12) if H_arm_L[i] <= H_arm_M[k]) <= Cumulative_M[k])
-
+for k in range(24):
+    for j in model.Pallet_Index:
+        model.constraints.add(
+            (sum(model.M[i,j] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(24) if H_arm_M.values[i] <= H_arm_M.values[k]) 
+            + sum(model.L[i,j] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in range(12) if H_arm_L.values[i] <= H_arm_M.values[k])) 
+            <= Cumulative_M[k])
 
 # Ensures that cumulative limit for each position in Lower deck in front part is not violated
-for j in model.Pallet_Index:
-    for k in range(12):
-        model.constraints.add(sum(model.M[i,j] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(26) if H_arm_M.values[i] <= H_arm_L.values[k]) + sum(model.L[i,j] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in range(12) if H_arm_L[i] <= H_arm_L[k]) <= Cumulative_L[k])
+for k in range(12):
+    for j in model.Pallet_Index:
+        model.constraints.add(
+            (sum(model.M[i,j] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(34) if H_arm_M.values[i] <= H_arm_L.values[k]) 
+            + sum(model.L[i,j] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in range(12) if H_arm_L.values[i] <= H_arm_L.values[k]))
+            <= Cumulative_L[k])
 
 # Ensures that cumulative limit for each position in Main deck in aft part is not violated
-for j in model.Pallet_Index:
-    for k in range(26,60):
-        model.constraints.add(sum(model.M[i,j] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(26,60) if H_arm_M.values[i] <= H_arm_M.values[k]) + sum(model.L[i,j] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in range(12,22) if H_arm_L[i] <= H_arm_M[k]) <= Cumulative_M[k])
+for k in range(29,60):
+    for j in model.Pallet_Index:
+        model.constraints.add(
+            (sum(model.M[i,j] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(29,60) if H_arm_M.values[i] <= H_arm_M.values[k]) 
+            + sum(model.L[i,j] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in range(12,22) if H_arm_L.values[i] <= H_arm_M.values[k]) )
+            <= Cumulative_M[k])
 
 # Ensures that cumulative limit for each position in Lower deck in aft part is not violated
-for j in model.Pallet_Index:
-    for k in range(12,22):
-        model.constraints.add(sum(model.M[i,j] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(26,60) if H_arm_M.values[i] <= H_arm_L.values[k]) + sum(model.L[i,j] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in range(12,22) if H_arm_L[i] <= H_arm_L[k]) <= Cumulative_L[k])
+for k in range(12,22):
+    for j in model.Pallet_Index:
+        model.constraints.add(
+            (sum(model.M[i,j] * Pallet_Weight.values[j] * Coefficient_M.values[i] for i in range(41,60) if H_arm_M.values[i] <= H_arm_L.values[k]) 
+            + sum(model.L[i,j] * Pallet_Weight.values[j] * Coefficient_L.values[i] for i in range(12,22) if H_arm_L.values[i] <= H_arm_L.values[k])) 
+            <= Cumulative_L[k])
 
 # -----------------------------------
 #        PART 4: BLUE ENVELOPE
@@ -214,53 +244,52 @@ for j in model.Pallet_Index:
 # Weight of each position
 for i in model.Main_Deck_Position_Index:
     for j in model.Pallet_Index:
-        model.w[i] += model.M[i,j] * Pallet_Weight.values[j]
+            model.constraints.add(model.w[i] >= model.M[i,j] * Pallet_Weight.values[j])
 
 for i in model.Lower_Deck_Position_Index:
     for j in model.Pallet_Index:
-        model.w[i + 60] += (model.L[i,j] * Pallet_Weight.values[j])
+            model.constraints.add(model.w[i+60] >= model.L[i,j] * Pallet_Weight.values[j])
 
 
 # Index of each position
 for i in model.Main_Deck_Position_Index:
-    model.i[i] = ((H_arm_M.values[i] - 36.3495) * model.w[i]) / 2500
+    model.constraints.add(model.i[i] >= ((H_arm_M.values[i] - 36.3495) * model.w[i]) / 2500)
 for i in model.Lower_Deck_Position_Index:
-    model.i[i + 60] = ((H_arm_L.values[i] - 36.3495) * model.w[i + 60]) / 2500
+    model.constraints.add(model.i[i + 60] >= ((H_arm_L.values[i] - 36.3495) * model.w[i + 60]) / 2500)
 
 
 # Total weight and Total index
-model.I = sum(model.i[i] for i in model.Position_Index) + model.DOI
-model.W = sum(model.w[i] for i in model.Position_Index) + model.DOW
-
+#model.constraints.add(model.I ==  sum(model.i[i] for i in model.Position_Index) + model.DOI)
+#model.constraints.add(model.W ==  sum(model.w[i] for i in model.Position_Index) + model.DOW)
 
 # Blue envelope constraints
-model.constraints.add(2*model.I -model.W <= 240)
-model.constraints.add(model.I + model.W >= 235)
-model.constraints.add(model.W >= 120)
-model.constraints.add(model.W <= 180)
-
+model.constraints.add(2 * (sum(model.i[i] for i in model.Position_Index) + model.DOI) - (sum(model.w[i] for i in model.Position_Index) + model.DOW) <= 240)
+model.constraints.add((sum(model.i[i] for i in model.Position_Index) + model.DOI) + (sum(model.w[i] for i in model.Position_Index) + model.DOW) >= 235)
+model.constraints.add((sum(model.w[i] for i in model.Position_Index) + model.DOW) >= 120)
 
 # Solve
 solver = SolverFactory('gurobi')
 solver.solve(model)
 #display(model)
 
+#for i in model.Position_Index:
+#    print(value(model.i[i]))
+    
 #Calculate the CPU time
 cpu_time = time.time() - start_time
 
-
+#To print values with their code names
 #To print values with their code names
 print("Optimal Assignment:")
 
 for i in model.Main_Deck_Position_Index:
     for j in model.Pallet_Index:
         if value(model.M[i,j]) == 1:
-            print("Pallet ", OriginalPallets['Code'][j] , "is assigned to Position ", Positions_M['Position'][i])
-
+            print( "Pallet ", OriginalPallets['Code'][j] , "with weight ", Pallet_Weight.values[j] , "is assigned to Position ", Positions_M['Position'][i], "with capacity" , Max_Weight_M.values[i])
 for i in model.Lower_Deck_Position_Index:
     for j in model.Pallet_Index:
         if value(model.L[i,j]) == 1:
-            print("Pallet ", OriginalPallets['Code'][j] , "is assigned to Position ", Positions_L['Position'][i])
+            print("Pallet ", OriginalPallets['Code'][j] , "with weight ", Pallet_Weight.values[j] , "is assigned to Position ", Positions_L['Position'][i],  "with capacity" , Max_Weight_L.values[i])
 print("\nTotal weight:", value(model.obj))
 
 '''
