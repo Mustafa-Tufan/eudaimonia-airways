@@ -7,9 +7,10 @@ excel_file = pd.read_excel('END395_ProjectPartIDataset.xlsx', sheet_name='Positi
 
 # Add new column for position types
 excel_file.loc[0:19, 'Type'] = 0
-excel_file.loc[20:59, 'Type'] = 1
-excel_file.loc[60:92, 'Type'] = 0
-excel_file.loc[93:103, 'Type'] = 1
+excel_file.loc[20:37, 'Type'] = 1
+excel_file.loc[38:81, 'Type'] = 2
+excel_file.loc[82:92, 'Type'] = 0
+excel_file.loc[83:103, 'Type'] = 1
 
 original_excel_file = excel_file.copy()
 excel_file.drop(labels = range(38, 60), axis=0, inplace=True)
@@ -28,8 +29,8 @@ Positions_M = pd.read_excel('END395_ProjectPartIDataset_SORTED_M.xlsx')
 Positions_L = pd.read_excel('END395_ProjectPartIDataset_SORTED_L.xlsx')
 
 
-print(Positions_M.to_string())
-print(Positions_L.to_string())
+#print(Positions_M.to_string())
+#print(Positions_L.to_string())
 
 
 #Getting The Main Deck Parameters
@@ -166,7 +167,7 @@ for i in model.Main_Deck_Position_Index:
     for j in model.Main_Deck_Position_Index:
         if(i != j):
             if(Lock1_M[i] <= Lock2_M[j] and Lock2_M[i] >= Lock1_M[j]):
-                if (Lock1_M[i] != Lock1_M[i] or Lock2_M[i] != Lock2_M[j]):
+                if (Lock1_M[i] != Lock1_M[j] or Lock2_M[i] != Lock2_M[j]):
                     for k in model.Pallet_Index:
                         model.constraints.add(model.M[i,k] + model.M[j,k]  <= 1 )
              
@@ -176,7 +177,7 @@ for i in model.Lower_Deck_Position_Index:
     for j in model.Lower_Deck_Position_Index:
         if(i != j):
             if(Lock1_L[i] <= Lock2_L[j] and Lock2_L[i] >= Lock1_L[j]):
-                if (Lock1_L[i] != Lock1_L[i] or Lock2_L[i] != Lock2_L[j]):
+                if (Lock1_L[i] != Lock1_L[j] or Lock2_L[i] != Lock2_L[j]):
                     for k in model.Pallet_Index:
                         model.constraints.add(model.L[i,k] + model.L[j,k]  <= 1 )
 
