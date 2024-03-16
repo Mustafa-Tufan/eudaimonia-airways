@@ -22,11 +22,8 @@ excel_file.drop(labels = "index", axis = 1, inplace = True)
 sorted_excel_file_M = excel_file.iloc[:60].sort_values(by='H-arm', ascending=True)
 sorted_excel_file_L = excel_file.iloc[60:].sort_values(by='H-arm', ascending=True)
 
-sorted_excel_file_M.to_excel('END395_ProjectPartIDataset_SORTED_M.xlsx', index=False)
-sorted_excel_file_L.to_excel('END395_ProjectPartIDataset_SORTED_L.xlsx', index=False)
-
-Positions_M = pd.read_excel('END395_ProjectPartIDataset_SORTED_M.xlsx')
-Positions_L = pd.read_excel('END395_ProjectPartIDataset_SORTED_L.xlsx')
+Positions_M = sorted_excel_file_M.reset_index(drop=True)
+Positions_L = sorted_excel_file_L.reset_index(drop=True)
 
 #Getting The Main Deck Parameters
 Lock1_M = Positions_M.iloc[:,1]
