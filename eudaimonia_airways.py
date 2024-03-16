@@ -39,6 +39,7 @@ Type_L = Positions_L.iloc[:,7]
 
 # Take the pallet dat
 Pallets = pd.read_excel('END395_ProjectPartIDataset.xlsx', sheet_name='Pallets1')
+OriginalPallets = Pallets.copy()
 
 Pallet_Type = Pallets.iloc[:,1]
 for i in range(len(Pallet_Type)):
@@ -82,10 +83,7 @@ model.z3 = Var(within=Binary)
 model.z4 = Var(within=Binary)
 model.z5 = Var(within=Binary)
 
-def ObjRule(model):
-    return sum(sum(model.M[i,j] * Pallet_Weight.values[j] for j in model.Pallet_Index) for i in model.Main_Deck_Position_Index) + sum(sum(model.L[i,j] * Pallet_Weight.values[j] for j in model.Pallet_Index) for i in model.Lower_Deck_Position_Index)
-# Objective function
-model.obj = Objective(rule=ObjRule, sense=maximize)
+model.obj = Objective(expr=sum(model.M[i,j] * Pallet_Weight.values[j] for i in model.Main_Deck_Position_Index for j in model.Pallet_Index) + sum(model.L[i,j] * Pallet_Weight.values[j] for i in model.Lower_Deck_Position_Index for j in model.Pallet_Index), sense=maximize)
 
 model.constraints = ConstraintList()
 
@@ -112,35 +110,26 @@ for j in model.Pallet_Index:
     model.constraints.add(sum(model.M[i,j] for i in model.Main_Deck_Position_Index) + sum(model.L[i,j] for i in model.Lower_Deck_Position_Index) <= 1)
 # Pallet type control
 # Added binary decision variables y1 y2 y3 y4 to the model for this part
-K = 10000
+K = 10000000
 
-# Main PAG Control
-for i in model.Main_Deck_Position_Index:
-    model.constraints.add(1-Type_M.values[i] <= K * model.y1)
+# Main Deck PAG And PMC control
 for i in model.Main_Deck_Position_Index:
     for j in model.Pallet_Index:
-        model.constraints.add(model.M[i,j] * Pallet_Type.values[j] <= K * (1 - model.y1))
-        
-# Lower PAG Control
-for i in model.Lower_Deck_Position_Index:
-    model.constraints.add(1-Type_L.values[i] <= K * model.y2)
-for i in model.Lower_Deck_Position_Index:
-    for j in model.Pallet_Index:
-        model.constraints.add(model.L[i,j] * Pallet_Type.values[j] <= K * (1 - model.y2))
-
-# Main PMC Control
-for i in model.Main_Deck_Position_Index:
-    model.constraints.add(Type_M.values[i] <= K * model.y3)
-for i in model.Main_Deck_Position_Index:
-    for j in model.Pallet_Index:
-        model.constraints.add(model.M[i,j] * (1 - Pallet_Type.values[j]) <= K * (1 - model.y3))
-
-# Lower PMC Control
-for i in model.Lower_Deck_Position_Index:
-    model.constraints.add(Type_L.values[i] <= K * model.y4)
+        # Check if the position is compatible with PAG pallets
+        if Type_M[i] == 0:
+            model.constraints.add(model.M[i,j] * Pallet_Type.values[j] <= 0)
+        if Type_M[i] == 1:
+            model.constraints.add(model.M[i,j] * (1 - Pallet_Type.values[j]) <= 0)
+      
+# Lower Deck PAG And PMC control
 for i in model.Lower_Deck_Position_Index:
     for j in model.Pallet_Index:
-        model.constraints.add(model.L[i,j] * (1 - Pallet_Type.values[j]) <= K * (1 - model.y4))   
+        # Check if the position is compatible with PAG pallets
+        if Type_L[i] == 0:
+            model.constraints.add(model.L[i,j] * Pallet_Type.values[j] <= 0)
+        if Type_L[i] == 1:
+            model.constraints.add(model.L[i,j] * (1 - Pallet_Type.values[j]) <= 0)
+  
 # -----------------------------------
 #        PART 2: COLLIDING
 # -----------------------------------
@@ -173,6 +162,7 @@ for i in model.Lower_Deck_Position_Index:
             model.constraints.add(sum(model.L[k,n] * Lock1_L.values[k] for n in model.Pallet_Index) - sum(model.L[i,j] * Lock2_L.values[i] for j in model.Pallet_Index) <= K * (1 - model.z5))
 # At least one of the above should be satisfied
 model.constraints.add(model.z4 + model.z5 >= 1)
+''' 
 # -----------------------------------
 #        PART 3: CUMULATIVE
 # -----------------------------------
@@ -222,7 +212,7 @@ model.constraints.add(2*model.I - model.W <= 240)
 model.constraints.add(model.I + model.W >= 235)
 model.constraints.add(model.W >= 120)
 model.constraints.add(model.W <= 180)
-
+'''
 # Solve
 solver = SolverFactory('cplex')
 solver.solve(model)
@@ -234,12 +224,12 @@ cpu_time = time.time() - start_time
 print("Optimal Assignment:")
 for i in model.Main_Deck_Position_Index:
     for j in model.Pallet_Index:
-        if value(model.M[i,j]) > 0:
-            print(f"Pallet {i} is assigned to Position {j}")
+        if value(model.M[i,j]) == 1:
+            print("Pallet ", OriginalPallets['Code'][j], "is assigned to Position ", Positions_M['Position'][i])
 for i in model.Lower_Deck_Position_Index:
     for j in model.Pallet_Index:
-        if value(model.L[i,j]) > 0:
-            print(f"Pallet {i} is assigned to Position {j}")
+        if value(model.L[i,j]) == 1:
+            print("Pallet ", OriginalPallets['Code'][j], "is assigned to Position ", Positions_L['Position'][i])
 print("\nTotal weight:", value(model.obj))
 
 #Print the CPU time
