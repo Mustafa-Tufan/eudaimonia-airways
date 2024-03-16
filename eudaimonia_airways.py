@@ -134,35 +134,30 @@ for i in model.Lower_Deck_Position_Index:
 #        PART 2: COLLIDING
 # -----------------------------------
 
-# Main deck collision handling method
-# (Lock1 and Lock2 of pallet j is lower than Lock1 and Lock2 of pallet n on main deck)
-
-for i in model.Main_Deck_Position_Index:
-    for k in model.Main_Deck_Position_Index:
-        if k != i:          
-            model.constraints.add(sum(model.M[i,j] * Lock2_M.values[i] for j in model.Pallet_Index) - sum(model.M[k,n] * Lock1_M.values[k] for n in model.Pallet_Index) <= K * (1 - model.z1))                       
-            model.constraints.add(sum(model.M[i,j] * Lock2_M.values[i] for j in model.Pallet_Index) - sum(model.M[k,n] * Lock2_M.values[k] for n in model.Pallet_Index) <= K * (1 - model.z1))            
-            model.constraints.add(sum(model.M[k,n] * Lock1_M.values[k] for n in model.Pallet_Index) - sum(model.M[i,j] * Lock1_M.values[i] for j in model.Pallet_Index) <= K * (1 - model.z2))
-            model.constraints.add(sum(model.M[k,n] * Lock1_M.values[k] for n in model.Pallet_Index) - sum(model.M[i,j] * Lock2_M.values[i] for j in model.Pallet_Index) <= K * (1 - model.z2))            
-            model.constraints.add(sum(model.M[k,n] * Lock1_M.values[k] for n in model.Pallet_Index) - sum(model.M[i,j] * Lock1_M.values[i] for j in model.Pallet_Index) == K * (1 - model.z3))            
-            model.constraints.add(sum(model.M[k,n] * Lock2_M.values[k] for n in model.Pallet_Index) - sum(model.M[i,j] * Lock2_M.values[i] for j in model.Pallet_Index) == K * (1 - model.z3))
+for i in range(0,len(model.Main_Deck_Position_Index) - 1):
+    for k in (i+1,len(model.Main_Deck_Position_Index) - 1):         
+        for j in range(0,len(model.Pallet_Index) - 1):
+            for n in (j+1,len(model.Pallet_Index) - 1):
+                model.constraints.add(model.M[i,j] * Lock2_M.values[i] - model.M[k,n] * Lock1_M.values[k] <= K * (1 - model.z1))
+                model.constraints.add(model.M[k,n] * Lock2_M.values[k] - model.M[i,j] * Lock1_M.values[i] <= K * (1 - model.z2))
+                model.constraints.add(model.M[k,n] * Lock1_M.values[k] - model.M[i,j] * Lock1_M.values[i] == K * (1 - model.z3)) 
+                model.constraints.add(model.M[k,n] * Lock2_M.values[k] - model.M[i,j] * Lock2_M.values[i] == K * (1 - model.z3))
     print("1")
     
 # At least one of the above should be satisfied
 model.constraints.add(model.z1 + model.z2 + model.z3 >= 1)            
-                       
-# Lower deck collision handling method
-# (Lock1 and Lock2 of pallet j is lower than Lock1 and Lock2 of pallet n on lower deck)
-for i in model.Lower_Deck_Position_Index:
-    for k in model.Lower_Deck_Position_Index:
-        if k != i:           
-            model.constraints.add(sum(model.L[i,j] * Lock2_L.values[i] for j in model.Pallet_Index) - sum(model.L[k,n] * Lock1_L.values[k] for n in model.Pallet_Index) <= K * (1 - model.z4))                       
-            model.constraints.add(sum(model.L[i,j] * Lock2_L.values[i] for j in model.Pallet_Index) - sum(model.L[k,n] * Lock2_L.values[k] for n in model.Pallet_Index) <= K * (1 - model.z4))            
-            model.constraints.add(sum(model.L[k,n] * Lock1_L.values[k] for n in model.Pallet_Index) - sum(model.L[i,j] * Lock1_L.values[i] for j in model.Pallet_Index) <= K * (1 - model.z5))
-            model.constraints.add(sum(model.L[k,n] * Lock1_L.values[k] for n in model.Pallet_Index) - sum(model.L[i,j] * Lock2_L.values[i] for j in model.Pallet_Index) <= K * (1 - model.z5))
+                        
+for i in range(0,len(model.Lower_Deck_Position_Index) - 1):
+    for k in (i+1,len(model.Lower_Deck_Position_Index) - 1):         
+        for j in range(0,len(model.Pallet_Index) - 1):
+            for n in (j+1,len(model.Pallet_Index) - 1):
+                model.constraints.add(model.L[i,j] * Lock2_L.values[i] - model.L[k,n] * Lock1_L.values[k] <= K * (1 - model.z4))
+                model.constraints.add(model.L[k,n] * Lock2_L.values[k] - model.L[i,j] * Lock1_L.values[i] <= K * (1 - model.z5))
+
 # At least one of the above should be satisfied
 model.constraints.add(model.z4 + model.z5 >= 1)
-''' 
+
+'''
 # -----------------------------------
 #        PART 3: CUMULATIVE
 # -----------------------------------
