@@ -207,16 +207,12 @@ for k in range(12,22):
 #        PART 4: BLUE ENVELOPE
 # -----------------------------------
 
-# Calculates Weights Of Each Position.
+# Calculates Weights And Indices Of Each Position.
 for i in model.Main_Deck_Position_Index:
     Weight[i] = sum(model.M[i,j] * Pallet_Weight.values[j] for j in model.Pallet_Index)
-for i in model.Lower_Deck_Position_Index:
-    Weight[i+60] = sum(model.L[i,j] * Pallet_Weight.values[j] for j in model.Pallet_Index)
-
-# Calculates Indices Of Each Position.
-for i in model.Main_Deck_Position_Index:
     Index[i] = sum(model.M[i,j] * (((H_arm_M[i] - 36.3495) * Pallet_Weight.values[j]) / 2500) for j in model.Pallet_Index)
 for i in model.Lower_Deck_Position_Index:
+    Weight[i+60] = sum(model.L[i,j] * Pallet_Weight.values[j] for j in model.Pallet_Index)
     Index[i+60] = sum(model.L[i,j] * (((H_arm_L[i] - 36.3495) * Pallet_Weight.values[j]) / 2500) for j in model.Pallet_Index)
 
 
