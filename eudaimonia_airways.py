@@ -18,7 +18,7 @@ excel_file.drop(labels = range(38, 60), axis=0, inplace=True)
 excel_file.reset_index(inplace = True)
 excel_file.drop(labels = "index", axis = 1, inplace = True)
 
-# Divides sheet into Main and Lower deck. Then sorts the sheets by H-arm values.
+# Divides The Sheet Into Main And Lower Deck. Then Sorts The Sheets By H-arm Values.
 sorted_excel_file_M = excel_file.iloc[:60].sort_values(by='H-arm', ascending=True)
 sorted_excel_file_L = excel_file.iloc[60:].sort_values(by='H-arm', ascending=True)
 
@@ -26,7 +26,7 @@ sorted_excel_file_L = excel_file.iloc[60:].sort_values(by='H-arm', ascending=Tru
 #            PARAMETERS
 # -----------------------------------
 
-# Assigns the main and lower deck positions to corresponded dataframe
+# Assigns The Main And Lower Deck Positions To Corresponded DataFrame
 Positions_M = sorted_excel_file_M.reset_index(drop=True)
 Positions_L = sorted_excel_file_L.reset_index(drop=True)
 
@@ -55,14 +55,14 @@ OriginalPallets = Pallets.copy()
 Pallet_Weight = Pallets.iloc[:,2]
 Pallet_Type = Pallets.iloc[:,1]
 
-# Assigns 0 if Pallet's Type is PAG and Assigns 1 if Pallet's Type is PAG and 
+# Assigns 0 if Pallet's Type is PAG and Assigns 1 if Pallet's Type is PAG. 
 for i in range(len(Pallet_Type)):
     if Pallet_Type.values[i].startswith("PAG"):
         Pallet_Type.values[i] = 0
     else:
         Pallet_Type.values[i] = 1
 
-
+#Takes DOW and DOI Values.
 DOW = Pallets.columns[4]
 DOI = Pallets.iloc[0,4]
 
