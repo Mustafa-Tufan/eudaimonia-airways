@@ -2,10 +2,10 @@ import time
 from pyomo.environ import *
 import pandas as pd
 
-# Reads the sheet
+# Reads The Sheet
 excel_file = pd.read_excel('END395_ProjectPartIDataset.xlsx', sheet_name='Positions')
 
-# Adds new column for position types. 0 for PAG, 1 for PMC, and 2 for both PAG PMC
+# Adds New Column For Position Types. 0 for PAG, 1 for PMC, and 2 for both PAG PMC
 excel_file.loc[0:19, 'Type'] = 0
 excel_file.loc[20:37, 'Type'] = 1
 excel_file.loc[38:81, 'Type'] = 2
