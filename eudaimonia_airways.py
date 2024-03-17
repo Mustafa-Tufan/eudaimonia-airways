@@ -259,7 +259,6 @@ for i in model.Main_Deck_Position_Index:
     for j in model.Pallet_Index:
         if value(model.M[i,j]) == 1:
             print(f"Pallet {OriginalPallets['Code'][j].ljust(5)} is assigned to Position {Positions_M['Position'][i]}")
-            #print("Pallet ", OriginalPallets['Code'][j] , "is assigned to Position ", Positions_M['Position'][i])
 for i in model.Lower_Deck_Position_Index:
     for j in model.Pallet_Index:
         if value(model.L[i,j]) == 1:
