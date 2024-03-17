@@ -230,7 +230,7 @@ model.constraints.add(model.I >=  sum(index[i] for i in model.Position_Index) + 
 model.constraints.add(model.I <=  sum(index[i] for i in model.Position_Index) + DOI)
 
 
-# Ensures That W and I Are In Blue Envelope.
+# Ensures That W and I Are In The Blue Envelope.
 model.constraints.add(2 * model.I - (model.W/1000) <= 240)
 model.constraints.add(model.I + (model.W/1000) >= 235)
 model.constraints.add((model.W/1000) >= 120)
