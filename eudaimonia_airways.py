@@ -236,7 +236,6 @@ solver.solve(model)
 # Calculates the CPU time
 cpu_time = time.time() - start_time
 
-
 # Assigning PAG/PMC To Main Deck Side-By-Side Positions According To Placed Pallet Types.
 for i in model.Main_Deck_Position_Index:
     if len(Positions_M['Position'][i]) == 7:
@@ -252,12 +251,12 @@ print("\nOptimal Assignment:")
 for i in model.Main_Deck_Position_Index:
     for j in model.Pallet_Index:
         if value(model.M[i,j]) == 1:
-            print(f"Pallet  {OriginalPallets['Code'][j].ljust(5)} is assigned to Position ", Positions_M['Position'][i])
+            print(f"Pallet {OriginalPallets['Code'][j].ljust(5)} is assigned to Position {Positions_M['Position'][i]}")
             #print("Pallet ", OriginalPallets['Code'][j] , "is assigned to Position ", Positions_M['Position'][i])
 for i in model.Lower_Deck_Position_Index:
     for j in model.Pallet_Index:
         if value(model.L[i,j]) == 1:
-            print(f"Pallet  {OriginalPallets['Code'][j].ljust(5)} is assigned to Position ", Positions_L['Position'][i])
+            print(f"Pallet {OriginalPallets['Code'][j].ljust(5)} is assigned to Position {Positions_L['Position'][i]}")
             
 print("\nObjective Function Value (Total Weight): ", value(model.obj))
 
