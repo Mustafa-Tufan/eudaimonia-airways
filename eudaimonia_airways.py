@@ -101,8 +101,15 @@ model.z3 = Var(within=Binary)
 model.z4 = Var(within=Binary)
 model.z5 = Var(within=Binary)
 
-# Objective function
+# -----------------------------------
+#         OBJECTIVE FUNCTION
+# -----------------------------------
 model.obj = Objective(expr=sum(model.M[i,j] * Pallet_Weight.values[j] for i in model.Main_Deck_Position_Index for j in model.Pallet_Index) + sum(model.L[i,j] * Pallet_Weight.values[j] for i in model.Lower_Deck_Position_Index for j in model.Pallet_Index), sense=maximize)
+
+
+# -----------------------------------
+#            CONSTRAINTS
+# -----------------------------------
 model.constraints = ConstraintList()
 
 # -----------------------------------
