@@ -85,8 +85,8 @@ model.L = Var(model.Lower_Deck_Position_Index, model.Pallet_Index, within=Binary
 model.W = Var(domain=NonNegativeIntegers)
 model.I = Var(domain=Reals)
 
-weight = [0] * len(model.Position_Index)
-index = [0] * len(model.Position_Index)
+Weight = [0] * len(model.Position_Index)
+Index = [0] * len(model.Position_Index)
 
 # Binary decision variables for (either-or) and (if-then) constraints
 model.y1 = Var(within=Binary)
@@ -105,7 +105,6 @@ model.z5 = Var(within=Binary)
 #         OBJECTIVE FUNCTION
 # -----------------------------------
 model.obj = Objective(expr=sum(model.M[i,j] * Pallet_Weight.values[j] for i in model.Main_Deck_Position_Index for j in model.Pallet_Index) + sum(model.L[i,j] * Pallet_Weight.values[j] for i in model.Lower_Deck_Position_Index for j in model.Pallet_Index), sense=maximize)
-
 
 # -----------------------------------
 #            CONSTRAINTS
@@ -210,24 +209,24 @@ for k in range(12,22):
 
 # Calculates Weights Of Each Position.
 for i in model.Main_Deck_Position_Index:
-    weight[i] = sum(model.M[i,j] * Pallet_Weight.values[j] for j in model.Pallet_Index)
+    Weight[i] = sum(model.M[i,j] * Pallet_Weight.values[j] for j in model.Pallet_Index)
 for i in model.Lower_Deck_Position_Index:
-    weight[i+60] = sum(model.L[i,j] * Pallet_Weight.values[j] for j in model.Pallet_Index)
+    Weight[i+60] = sum(model.L[i,j] * Pallet_Weight.values[j] for j in model.Pallet_Index)
 
 # Calculates Indices Of Each Position.
 for i in model.Main_Deck_Position_Index:
-    index[i] = sum(model.M[i,j] * (((H_arm_M[i] - 36.3495) * Pallet_Weight.values[j]) / 2500) for j in model.Pallet_Index)
+    Index[i] = sum(model.M[i,j] * (((H_arm_M[i] - 36.3495) * Pallet_Weight.values[j]) / 2500) for j in model.Pallet_Index)
 for i in model.Lower_Deck_Position_Index:
-    index[i+60] = sum(model.L[i,j] * (((H_arm_L[i] - 36.3495) * Pallet_Weight.values[j]) / 2500) for j in model.Pallet_Index)
+    Index[i+60] = sum(model.L[i,j] * (((H_arm_L[i] - 36.3495) * Pallet_Weight.values[j]) / 2500) for j in model.Pallet_Index)
 
 
 # Calculates W
-model.constraints.add(model.W >=  sum(weight[i] for i in model.Position_Index) + DOW)
-model.constraints.add(model.W <=  sum(weight[i] for i in model.Position_Index) + DOW)
+model.constraints.add(model.W >=  sum(Weight[i] for i in model.Position_Index) + DOW)
+model.constraints.add(model.W <=  sum(Weight[i] for i in model.Position_Index) + DOW)
 
 # Calculates I
-model.constraints.add(model.I >=  sum(index[i] for i in model.Position_Index) + DOI)
-model.constraints.add(model.I <=  sum(index[i] for i in model.Position_Index) + DOI)
+model.constraints.add(model.I >=  sum(Index[i] for i in model.Position_Index) + DOI)
+model.constraints.add(model.I <=  sum(Index[i] for i in model.Position_Index) + DOI)
 
 
 # Ensures That W and I Are In The Blue Envelope.
