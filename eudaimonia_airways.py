@@ -258,7 +258,7 @@ for i in model.Lower_Deck_Position_Index:
         if value(model.L[i,j]) == 1:
             print(f"Pallet {OriginalPallets['Code'][j].ljust(5)} is assigned to Position {Positions_L['Position'][i]}")
             
-print("\nObjective Function Value (Total Weight): ", value(model.obj))
+print("\nObjective Function Value (Total Weight):", value(model.obj))
 
 #Print the CPU time
 print("CPU Time:", cpu_time, "seconds")    
