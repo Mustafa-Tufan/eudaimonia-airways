@@ -23,7 +23,7 @@ excel_file.drop(labels = "index", axis = 1, inplace = True)
 sorted_excel_file_M = excel_file.iloc[:60].sort_values(by='H-arm', ascending=True)
 sorted_excel_file_L = excel_file.iloc[60:].sort_values(by='H-arm', ascending=True)
 
-# Slices Dataset for Part II
+# Extracts Lower Deck Positions from Dataset II
 slice1 = excel_file2.loc[2:3]
 slice2 = excel_file2.loc[10:11]
 slice3 = excel_file2.loc[18:19]
@@ -39,6 +39,7 @@ slice11 = excel_file2.loc[94:95]
 sliced_excel_file_L = pd.concat([slice1, slice2, slice3, slice4, slice5, slice6, slice7, slice8, slice9, slice10, slice11], ignore_index=True)
 sliced_excel_file_L.reset_index(drop=True, inplace=True)
 
+# Extracts Main Deck Positions from Dataset II
 excel_file2.drop(slice1.index, inplace=True)
 excel_file2.drop(slice2.index, inplace=True)
 excel_file2.drop(slice3.index, inplace=True)
@@ -63,12 +64,11 @@ excel_file2.drop(excel_file2.loc[69:70].index, inplace=True)
 excel_file2.drop(excel_file2.loc[77:78].index, inplace=True)
 excel_file2.drop(excel_file2.loc[86:87].index, inplace=True)
 
-
 sliced_excel_file_M = excel_file2
 sliced_excel_file_M.reset_index(inplace = True)
 
-sliced_excel_file_M.to_excel('2_M.xlsx', index=False)
-sliced_excel_file_L.to_excel('2_L.xlsx', index=False)
+#sliced_excel_file_M.to_excel('2_M.xlsx', index=False)
+#sliced_excel_file_L.to_excel('2_L.xlsx', index=False)
 
 results = []
 
@@ -128,8 +128,8 @@ for cg_interval in range(4):
                 Pallet_Type.values[i] = 1
 
         #Takes DOW and DOI Values.
-        DOW = Pallets.columns[4]
-        DOI = Pallets.iloc[0,4]
+        DOW = Pallets.columns[5]
+        DOI = Pallets.iloc[0,5]
 
         model = ConcreteModel()
         start_time = time.time()
