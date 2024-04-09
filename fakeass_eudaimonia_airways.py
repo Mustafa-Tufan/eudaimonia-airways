@@ -99,19 +99,9 @@ for cg_interval in range(4):
         #Cumulative_L = Positions_L.iloc[:,5]
         Coefficient_L = Positions_L.iloc[:,6]
         Type_L = Positions_L.iloc[:,7]   #Stores the Type (PAG or PMC) of positions in the Lower deck
-
-        if (cg_interval == 0): 
-            Cumulative_M = sliced_excel_file_M.iloc[:,2]
-            Cumulative_L = sliced_excel_file_L.iloc[:,2]
-        if (cg_interval == 1): 
-            Cumulative_M = sliced_excel_file_M.iloc[:,3]
-            Cumulative_L = sliced_excel_file_L.iloc[:,3]
-        if (cg_interval == 2): 
-            Cumulative_M = sliced_excel_file_M.iloc[:,4]
-            Cumulative_L = sliced_excel_file_L.iloc[:,4]
-        if (cg_interval == 3): 
-            Cumulative_M = sliced_excel_file_M.iloc[:,5]
-            Cumulative_L = sliced_excel_file_L.iloc[:,5]
+ 
+        Cumulative_M = sliced_excel_file_M.iloc[:,cg_interval+2]
+        Cumulative_L = sliced_excel_file_L.iloc[:,cg_interval+2]
 
         # Take the Pallets' data
         Pallets = pd.read_excel('END395_ProjectPartIIDataset.xlsx', sheet_name='Pallets4')
