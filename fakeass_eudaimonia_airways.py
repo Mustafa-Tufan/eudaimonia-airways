@@ -72,7 +72,7 @@ sliced_excel_file_M.reset_index(inplace = True)
 
 results = []
 
-for cg_interval in range(4):
+for cg_interval in [1,0,2,3]:
     try:
         # -----------------------------------
         #            PARAMETERS
@@ -293,7 +293,8 @@ for cg_interval in range(4):
         # Solves The Model
         solver = SolverFactory('gurobi')
         solver.solve(model)
-        results.append(value(model.obj))
+        results.append((cg_interval+1,value(model.obj)))
+        break
         
     except Exception as e: 
         print(f"CG Interval {cg_interval+1} is Infeasible")
@@ -329,4 +330,4 @@ for i in model.Lower_Deck_Position_Index:
 print("\nObjective Function Value (Total Weight):", value(model.obj))
 
 #Print the CPU time
-print("CPU Time:", cpu_time, "seconds")    
+print("CPU Time:", cpu_time, "seconds")
