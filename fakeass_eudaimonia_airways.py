@@ -71,6 +71,7 @@ sliced_excel_file_M.reset_index(inplace = True)
 #sliced_excel_file_L.to_excel('2_L.xlsx', index=False)
 
 results = []
+outputs = [[],[],[],[]]
 
 for cg_interval in [1,0,2,3]:
     try:
@@ -291,43 +292,48 @@ for cg_interval in [1,0,2,3]:
         Coefficient_M = Positions_M.iloc[:,6]
 
         # Solves The Model
-        solver = SolverFactory('gurobi')
+        solver = SolverFactory('cplex')
         solver.solve(model)
-        results.append((cg_interval+1,value(model.obj)))
-        break
+        results.append((cg_interval,value(model.obj)))
+        # Assigning PAG/PMC To Main Deck Side-By-Side Positions According To Placed Pallet Types.
+        for i in model.Main_Deck_Position_Index:
+            if len(Positions_M['Position'][i]) == 7:
+                for j in model.Pallet_Index:
+                    if value(model.M[i,j]) == 1:
+                        if Pallet_Type[j] == 1:
+                            Positions_M.loc[i, 'Position'] = Positions_M.loc[i, 'Position'].replace("88", "96")
+                                        
+        output = []
+        # Prints The Optinmal Assignments
+        output += ["\nOptimal Assignment:"]
+
+        for i in model.Main_Deck_Position_Index:
+            for j in model.Pallet_Index:
+                if value(model.M[i,j]) == 1:
+                    output += [f"Pallet {OriginalPallets['Code'][j].ljust(5)} is assigned to Position {Positions_M['Position'][i]}"]
+        for i in model.Lower_Deck_Position_Index:
+            for j in model.Pallet_Index:
+                if value(model.L[i,j]) == 1:
+                    output += [f"Pallet {OriginalPallets['Code'][j].ljust(5)} is assigned to Position {Positions_L['Position'][i]}"]
+                    
+        output += [f"\nObjective Function Value (Total Weight):{value(model.obj)}"]
+        
+        outputs[cg_interval] += output
         
     except Exception as e: 
         print(f"CG Interval {cg_interval+1} is Infeasible")
 
-print("-----------------------")
-print(results)
-print("-----------------------")
 
 # Calculates the CPU time
 cpu_time = time.time() - start_time
 
-# Assigning PAG/PMC To Main Deck Side-By-Side Positions According To Placed Pallet Types.
-for i in model.Main_Deck_Position_Index:
-    if len(Positions_M['Position'][i]) == 7:
-        for j in model.Pallet_Index:
-            if value(model.M[i,j]) == 1:
-                if Pallet_Type[j] == 1:
-                    Positions_M.loc[i, 'Position'] = Positions_M.loc[i, 'Position'].replace("88", "96")
-                                
 
-# Prints The Optinmal Assignments
-print("\nOptimal Assignment:")
+# Find the tuple with the maximum second element
+max_tuple = max(results, key=lambda x: x[1])
+print(f"{max_tuple[0]+1} is optimal. Obj: {max_tuple[1]}")
+for line in outputs[max_tuple[0]]:
+    print(line)
 
-for i in model.Main_Deck_Position_Index:
-    for j in model.Pallet_Index:
-        if value(model.M[i,j]) == 1:
-            print(f"Pallet {OriginalPallets['Code'][j].ljust(5)} is assigned to Position {Positions_M['Position'][i]}")
-for i in model.Lower_Deck_Position_Index:
-    for j in model.Pallet_Index:
-        if value(model.L[i,j]) == 1:
-            print(f"Pallet {OriginalPallets['Code'][j].ljust(5)} is assigned to Position {Positions_L['Position'][i]}")
-            
-print("\nObjective Function Value (Total Weight):", value(model.obj))
 
 #Print the CPU time
 print("CPU Time:", cpu_time, "seconds")
