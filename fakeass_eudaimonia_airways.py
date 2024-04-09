@@ -51,6 +51,19 @@ excel_file2.drop(slice9.index, inplace=True)
 excel_file2.drop(slice10.index, inplace=True)
 excel_file2.drop(slice11.index, inplace=True)
 
+excel_file2.drop(excel_file2.loc[4:5].index, inplace=True)
+excel_file2.drop(excel_file2.loc[12:13].index, inplace=True)
+excel_file2.drop(excel_file2.loc[21:22].index, inplace=True)
+excel_file2.drop(excel_file2.loc[32:33].index, inplace=True)
+excel_file2.drop(excel_file2.loc[40:41].index, inplace=True)
+excel_file2.drop(excel_file2.loc[47:48].index, inplace=True)
+excel_file2.drop(excel_file2.loc[53:54].index, inplace=True)
+excel_file2.drop(excel_file2.loc[61:62].index, inplace=True)
+excel_file2.drop(excel_file2.loc[69:70].index, inplace=True)
+excel_file2.drop(excel_file2.loc[77:78].index, inplace=True)
+excel_file2.drop(excel_file2.loc[86:87].index, inplace=True)
+
+
 sliced_excel_file_M = excel_file2
 sliced_excel_file_M.reset_index(inplace = True)
 
