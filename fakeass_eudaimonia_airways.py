@@ -101,7 +101,7 @@ for cg_interval in range(4):
             Cumulative_L = sliced_excel_file_L.iloc[:,5]
 
         # Take the Pallets' data
-        Pallets = pd.read_excel('END395_ProjectPartIDataset.xlsx', sheet_name='Pallets1')
+        Pallets = pd.read_excel('END395_ProjectPartIIDataset.xlsx', sheet_name='Pallets4')
         OriginalPallets = Pallets.copy()
 
         Pallet_Weight = Pallets.iloc[:,2]
